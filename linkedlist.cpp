@@ -10,6 +10,18 @@ Write your code in this editor and press "Debug" button to debug it.
 
 using namespace std;
 
+/******************************************************************************
+
+                              Online C++ Debugger.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Debug" button to debug it.
+
+*******************************************************************************/
+
+#include <iostream>
+
+using namespace std;
+
 struct Node {
     int data;
     Node* next;
@@ -36,6 +48,9 @@ Node* Insert(Node* head, int val){
     return head;
 }
 
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+
 // Delete nth node in list
 // If first node: head->NULL and delete first in list 
 // If not first node: delete node at n-1 and link the before and after nodes
@@ -59,6 +74,9 @@ Node* Delete(Node* head, int n) {
     return head;
 }
 
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+
 // Reverse the order of nodes in the list\
 // if head==NULL or end of list (exit case): return head;
 // recurseive case: recurse on head->next, when it exits set head to node->next
@@ -73,138 +91,227 @@ Node* ReverseRecurse(Node* head) {
     return node;
 }
 
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+
 Node* DeleteNthFromEnd(Node*head, int n) {
-    Node* slow = head; Node* fast = head; Node*start = head;
-    
-    for (int i = 0; i <= n; i++) {
-        fast = fast->next;
-    }
-    
-    while(fast!=NULL && fast->next!=NULL){
-        slow = slow->next;
-        fast = fast->next;
-    }
-    Node *node = slow->next;
-    slow->next = node->next;
-    delete node;
-    
-    return start;
+    if (!head)
+            return nullptr;
+
+	Node new_head(-1);
+	new_head.next = head;
+
+	Node *slow = &new_head, *fast = &new_head;
+
+	for (int i = 0; i < n; i++)
+		fast = fast->next;
+
+	while (fast->next) 
+	{
+		fast = fast->next;
+		slow = slow->next;
+	}
+
+	Node *to_be_deleted = slow->next;
+	slow->next = slow->next->next;
+
+	delete to_be_deleted;
+
+	return new_head.next;
     
 }
 
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 
-Node* Merge(Node* left, Node* right) {
-    Node* sortedTmp = new Node();
-    Node* currNode = sortedTmp;
-    while (left != NULL && right !=NULL) {
-        if (left->data < right->data) {
-            currNode->next = left;
-            left = left->next;
-        } else {
-            currNode->next = right;
-            right = right->next;
-        }
-        currNode = currNode->next;
-    }
+Node* RemoveDuplicates(Node* head, int target) {
+    Node*start = new Node();
+    start->next = head;
+    Node* slow = start->next;
     
-    if (left !=NULL) {
-        currNode->next = left;
-        left = left->next;
-    }
-    if (right !=NULL) {
-        currNode->next = right;
-        right = right->next;
-    }
-    
-    return sortedTmp->next;
-}
-
-
-// if head is null or only 1 node, then list is already sorted
-// fast is end of right half, slow is start of right half
-// head is at start of left half, tmp is at end of right half
-Node* mergeSort(Node* head){
     if (head==NULL || head->next == NULL) {
         return head;
     }
-    Node* slow = head, *fast = head, *tmp = head;
-    while(fast!=NULL && fast->next != NULL) {
-        tmp = slow;
-        fast = fast->next->next;
+    //for each node, loop through all following nodes and check for match
+    //if match is found... delete both nodes from linked list
+    Node* prevSlow = start;
+    while(slow!=NULL){ 
+        Node* fast = slow->next; 
+        Node *prevFast = slow; 
+        while(fast!=NULL) {
+            if (fast->data == slow->data) {
+                prevFast->next = fast->next; 
+                prevSlow->next = slow->next;
+            }
+            prevFast = fast;
+            fast = fast->next; 
+        }
+        prevSlow = slow;
         slow = slow->next;
     }
-    
-    //seperate left half from right half
-    tmp->next = NULL;
-    
-    Node *left = mergeSort(head);
-    Node *right = mergeSort(slow);
-    
-    return Merge(left, right);
+    return start->next;
 }
 
-int main()
-{
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+
+//Palindrome Linked list
+Node* tmpPal;
+
+bool checkPal(Node* node){
+    if (node==NULL){
+        return true;
+    }
+    bool isPal = checkPal(node->next) & (tmpPal->data==node->data);
+    tmpPal=tmpPal->next;
+    return isPal;
+}
+bool isPalindrome(Node* head){
+    tmpPal = head;
+    return checkPal(head);
+}
+
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+// Delete a given node from list
+void deleteThisNode(Node* node){
+    *node = *(node->next);
+}
+
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+//Check for cycle in list
+bool hasCycle(Node *head) {
+    if (head==NULL || head->next==NULL){
+        return false;
+    }
+    Node* slow = head, *fast = head;
+    while(fast!=NULL && fast->next !=NULL){
+        fast = fast->next->next;
+        slow = slow->next;
+        
+        if (fast==slow) {
+            return true;
+        }
+        /*
+        if (fast!=NULL && fast->next!=NULL){
+            if (fast->next==slow){
+                return true;
+            }
+        }
+        */
+    }
+    return false;
+}
+
+/*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
+
+Node* BuildList() {
     struct Node* head;
     head = nullptr;
-    Node *first = new Node(1);
-    Node *sec = new Node(2);
     
-    head = Insert(head, 1);
+    head = Insert(head, 3);
     head = Insert(head, 6);
     head = Insert(head, 8);
     head = Insert(head, 4);
     head = Insert(head, 3);
     
-    Node *tmp = head;
+    return head;
+}
 
-    Node* headptr = head;
-    Node* mergePtr = tmp;
+Node* buildPalindrome() {
+    struct Node* head;
+    head = nullptr;
+    
+    head = Insert(head, 1);
+    head = Insert(head, 2);
+    head = Insert(head, 4);
+    head = Insert(head, 4);
+    head = Insert(head, 2);
+    head = Insert(head, 1);
+    
+    return head;
+}
 
+int main()
+{
+    Node* head = BuildList();
+    Node* headPtr = head;
+    
+    Node* printOG = headPtr, * dupe = headPtr;
+    Node* head2 = BuildList();
+
+    Node* head3 = BuildList();
+
+    Node* head4 = BuildList();
+    
+    Node* head5 = buildPalindrome();
+    
+    Node* head6 = BuildList();
+    
+    Node* head7 = BuildList();
+    
     printf("Printing original linked list...");
-    while (headptr != NULL) {
-        printf(" %d ", headptr->data);
-        headptr = headptr->next;
+    while (printOG != NULL) {
+        printf(" %d ", printOG->data);
+        printOG = printOG->next;
     }
     
     printf("\n");
-    
-    printf("Printing sorted list after mergeSort... ");
-    Node* mergeAns = mergeSort(mergePtr);
-    while(mergeAns != NULL) {
-        printf("%d ", mergeAns->data);
-        mergeAns = mergeAns->next;
+    printf("Printing list after removing duplicates... ");
+    Node* dupeRes = RemoveDuplicates(dupe, 3);
+    while (dupeRes != NULL) {
+        printf("%d ", dupeRes->data);
+        dupeRes = dupeRes->next;
     }
+    
     printf("\n");
-    
-    Node* headDel = Delete(head, 3);
-    
-    printf("Printing linked list after deletion... ");
+    Node* headDel = Delete(head2, 3);
+    printf("Printing linked list after deletion of 3rd node... ");
     while (headDel != NULL){
         printf("%d ", headDel->data);
         headDel = headDel->next;
     }
     
     printf("\n");
-    
-    Node* delNthFromEnd = DeleteNthFromEnd(head, 0);
-    
-    printf("Printing list after deletion from Nth node...");
+    Node* delNthFromEnd = DeleteNthFromEnd(head3, 1);
+    printf("Printing list after deletion from 1st node from the end... ");
     while (delNthFromEnd != NULL) {
         printf("%d ", delNthFromEnd->data);
         delNthFromEnd = delNthFromEnd->next;
     }
     
     printf("\n");
-    
-    Node* headRevRec = ReverseRecurse(head);
-    
-    
+    Node* headRevRec = ReverseRecurse(head4);
     printf("Printing linked list after reversal... ");
     while (headRevRec != NULL){
         printf("%d ", headRevRec->data);
         headRevRec = headRevRec->next;
     }
     
+    printf("\n");
+    bool palRes = isPalindrome(head5);
+    printf("Printing wether list is Palindrome... ");
+    if (palRes==true) {printf("true");} 
+    else {printf("false");}
+    
+    printf("\n");
+    Node* delNode = head6->next;
+    deleteThisNode(delNode);
+    printf("Printing list after deleting the given node... ");
+    while (head6 != NULL){
+        printf("%d ", head6->data);
+        head6 = head6->next;
+    }
+    
+    printf("\n");
+    bool isCycle = hasCycle(head7);
+    printf("Printing wether list has cycle... ");
+    if (isCycle==true) {printf("true");} 
+    else {printf("false");}
+
+    
     return 0;
 }
+
